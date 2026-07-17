@@ -1,12 +1,20 @@
 import mongoose from "mongoose";
+import dns from "node:dns";
 import config from "./config.js";
 
-async function connectDB(){
-    if (!config.MONGO_URI) {
-        throw new Error("MONGO_URI is not set in the environment");
-    }
+async function connectDB() {
+    try {
+        console.log("Connecting to MongoDB...");
 
-    await mongoose.connect(config.MONGO_URI)
-    console.log("MongoDB connected successfully");
+        dns.setServers(["8.8.8.8", "1.1.1.1"]);
+        await mongoose.connect(config.MONGO_URI);
+
+        console.log("✅ MongoDB connected successfully");
+    } catch (err) {
+        console.error("❌ MongoDB Connection Error");
+        console.error(err);
+        process.exit(1);
+    }
 }
+
 export default connectDB;
